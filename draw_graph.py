@@ -20,11 +20,13 @@ one_hour_before = current_time - 1 * 60 * 60
 if not prometheus_api_url.endswith("/"):
     prometheus_api_url += "/"
 
+series_name = "prometheus_tsdb_head_series"
+
 response = requests.get(urljoin(
     prometheus_api_url,
     "api/v1/query_range"
 ), params={
-    "query": "prometheus_tsdb_head_series",
+    "query": series_name,
     "start": int(one_hour_before),
     "end": int(current_time),
     "step": "15s"
@@ -47,7 +49,8 @@ df = pd.DataFrame(dict(
     values=values
 ))
 
-graph = px.line(df, x=df['time'], y=df['values'])
+graph = px.line(df, x=df['time'], y=df['values'], title=series_name)
+
 
 with open("graph.png", 'wb') as f:
 
